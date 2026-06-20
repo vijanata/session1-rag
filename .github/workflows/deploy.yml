@@ -22,19 +22,14 @@ jobs:
           context: .
           push: true
           tags: |
-            vijai1984/session1-rag
+            vijai1984/session1-rag:latest
             vijai1984/session1-rag:${{ steps.vars.outputs.sha_short }}
-      - name: Write SSH Private Key
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s' '${{ secrets.VM_SSH_KEY }}' > ~/.ssh/id_ed25519_github
-          chmod 600 ~/.ssh/id_ed25519_github
       - name: Deploy to VM
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VM_IP }}
           username: ${{ secrets.VM_USERNAME }}
-          key_path: ~/.ssh/id_ed25519_github
+          key: ${{ secrets.VM_SSH_KEY }}
           script: |
             docker pull vijai1984/session1-rag:latest
             docker stop api-server || true
@@ -43,4 +38,4 @@ jobs:
               --name api-server \
               -p 80:8000 \
               --env-file .env \
-              vijai1984/session1-rag
+              vijai1984/session1-rag:latest
